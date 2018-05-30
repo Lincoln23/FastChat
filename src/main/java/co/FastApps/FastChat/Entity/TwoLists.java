@@ -5,11 +5,12 @@ import com.amazonaws.services.comprehend.model.KeyPhrase;
 
 import java.util.List;
 
+@Deprecated
 public class TwoLists {
     private List<Entity> listEntity;
     private List<KeyPhrase> listKey;
 
-
+    @Deprecated
     public TwoLists(List<Entity> listEntity, List<KeyPhrase> listKey) {
         this.listEntity = listEntity;
         this.listKey = listKey;

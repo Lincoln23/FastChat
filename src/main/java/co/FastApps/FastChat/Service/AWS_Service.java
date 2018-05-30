@@ -68,35 +68,16 @@ public class AWS_Service {
         System.out.println("KeyList" + keyList);
         List<ResultType> result = new ArrayList<>();
 
-        if(keyList.get(0).getText().contains("phone number")){
-            System.out.println("YAYA");
-        }
-
         for (Entity entity : list) {
             if (entity.getType().equals("PERSON")) {
-                result.add(aws_rds_dao.getPerson(entity.getText()));
+                try{
+                    result.add(aws_rds_dao.getPerson(entity.getText()));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
             }
         }
         return result;
-
-//        Gson gson = new Gson();
-//
-//        TwoLists twoLists = new TwoLists(list, keyList);
-//        String json = gson.toJson(twoLists);
-//        System.out.println("Json Sent: " + json);
-//
-////        Type resultListType = new TypeToken<ArrayList<ArrayList<ResultType>>>() {
-////        }.getType();
-////        List<ResultType> resultObj = new Gson().fromJson(result, resultListType);
-////        List<ResultType> tempList;
-////        for (int i = 0; i < resultObj.size(); i++) {
-////            tempList = (List<ResultType>) resultObj.get(i);
-////            for (int j = 0; j < tempList.size(); j++) {
-////                return "Hello: " + tempList.get(j).getType() + " " + tempList.get(j).getText();
-////            }
-////        }
-
-
     }
-
 }
