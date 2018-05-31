@@ -38,8 +38,8 @@ public class AWS_Service {
 
 
         //AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
-        BasicAWSCredentials awsCreds = new BasicAWSCredentials("AKIAIU2XBBCCLWBK2GCQ" ,
-                "p5S8LEFS0o/toV4nJQZDEiHojgsO4C6O9m+ou4LM");
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials("your access key" ,
+                "your secret key");
 
         AmazonComprehend comprehendClient =
                 AmazonComprehendClientBuilder.standard()
