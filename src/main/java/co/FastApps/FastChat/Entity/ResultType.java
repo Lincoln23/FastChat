@@ -2,35 +2,12 @@ package co.FastApps.FastChat.Entity;
 
 public class ResultType {
     private int id;
-    private String Type;
-    private String Text;
+    private String name;
+    private String dateFounded;
     private String phone;
     private String email;
     private String company;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getType() {
-        return Type;
-    }
-
-    public void setType(String type) {
-        Type = type;
-    }
-
-    public String getText() {
-        return Text;
-    }
-
-    public void setText(String text) {
-        Text = text;
-    }
+    private String city;
 
     public String getPhone() {
         return phone;
@@ -56,5 +33,48 @@ public class ResultType {
         this.company = company;
     }
 
+    public String getCity() {
+        return city;
+    }
 
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDateFounded() {
+        return dateFounded;
+    }
+
+    public void setDateFounded(String dateFounded) {
+        this.dateFounded = dateFounded;
+    }
+
+    @Override
+    public String toString() {
+        return "ResultType{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", dateFounded='" + dateFounded + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", company='" + company + '\'' +
+                ", city='" + city + '\'' +
+                '}';
+    }
 }

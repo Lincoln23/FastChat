@@ -2,23 +2,21 @@ package co.FastApps.FastChat.Service;
 
 import co.FastApps.FastChat.Dao.AWS_RDS_dao;
 import co.FastApps.FastChat.Entity.ResultType;
-import co.FastApps.FastChat.Entity.TwoLists;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.*;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.comprehend.AmazonComprehend;
 import com.amazonaws.services.comprehend.AmazonComprehendClientBuilder;
 import com.amazonaws.services.comprehend.model.*;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
+
+import javax.xml.transform.Result;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 public class AWS_Service {
@@ -28,19 +26,24 @@ public class AWS_Service {
     AWS_RDS_dao aws_rds_dao;
 
 
-    public List<ResultType> getEverything() {
-        return aws_rds_dao.getAll();
-    }
 
-
-    public List<ResultType> comprehend(String text) {
+    public List<List<ResultType>> comprehend(String text) {
         List<Entity> list;
         List<KeyPhrase> keyList;
-        AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
+
+//        DefaultAWSCredentialsProviderChain awsCreds = new DefaultAWSCredentialsProviderChain();
+//
+//        EnvironmentVariableCredentialsProvider env = new EnvironmentVariableCredentialsProvider();
+//        env.getCredentials();
+
+
+        //AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials("AKIAIU2XBBCCLWBK2GCQ" ,
+                "p5S8LEFS0o/toV4nJQZDEiHojgsO4C6O9m+ou4LM");
 
         AmazonComprehend comprehendClient =
                 AmazonComprehendClientBuilder.standard()
-                        .withCredentials(awsCreds)
+                        .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                         .withRegion(Regions.US_EAST_1)
                         .build();
 
@@ -66,16 +69,22 @@ public class AWS_Service {
         }
         System.out.println("ListEntities" + list);
         System.out.println("KeyList" + keyList);
-        List<ResultType> result = new ArrayList<>();
-
-        for (Entity entity : list) {
-            if (entity.getType().equals("PERSON")) {
+        List<List<ResultType>> result = new ArrayList<>();
+        for (int i =0 ; i < list.size(); i++) {
+            if (list.get(i).getType().equals("ORGANIZATION")) {
                 try{
-                    result.add(aws_rds_dao.getPerson(entity.getText()));
+                    result.add(aws_rds_dao.getCompanies(list.get(i).getText()));
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-
+            }
+            else if(list.get(i).getType().equals("LOCATION")){
+                try{
+                    System.out.println("in here");
+                    result.add(aws_rds_dao.getContact(list.get(i).getText()));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         }
         return result;
