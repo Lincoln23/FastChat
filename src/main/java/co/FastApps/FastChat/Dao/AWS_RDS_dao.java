@@ -4,10 +4,11 @@ import co.FastApps.FastChat.Entity.ResultType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,30 +20,8 @@ public class AWS_RDS_dao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-//    private static class ResultRowMapper implements RowMapper<ResultType> {
-//
-//        @Override
-//        public ResultType mapRow(ResultSet resultSet, int i) throws SQLException {
-//            ResultType resultType = new ResultType();
-//            resultType.setId(resultSet.getInt("id"));
-//            resultType.setType(resultSet.getString("Type"));
-//            resultType.setText(resultSet.getString("Text"));
-//            resultType.setPhone(resultSet.getString("Phone"));
-//            resultType.setEmail(resultSet.getString("Email"));
-//            resultType.setCompany(resultSet.getString("Company"));
-//            return resultType;
-//        }
-//    }
-
-
-//    public List<ResultType> getAll(){
-//        final String sql = "SELECT * FROM Customers";
-//        List<ResultType> result = jdbcTemplate.query(sql, new ResultRowMapper());
-//        return result;
-//    }
-
-    public List<ResultType> getCompanies(String name) {
-        final String sql = "SELECT * FROM Companies WHERE Name = ?";
+    public List<ResultType> getCompanies(String Type, String name) {
+        final String sql = "SELECT * FROM Companies WHERE " + Type + " = + ?";
         final List<ResultType> result = jdbcTemplate.query(sql, new ResultSetExtractor<List<ResultType>>() {
             @Override
             public List<ResultType> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -50,20 +29,19 @@ public class AWS_RDS_dao {
                 while(resultSet.next()) {
                     ResultType resultType = new ResultType();
                     resultType.setId(resultSet.getInt("id"));
-                    resultType.setName(resultSet.getString("Name"));
+                    resultType.setName(resultSet.getString("Organization"));
                     resultType.setDateFounded(resultSet.getString("date-Founded"));
+                    resultType.setCity(resultSet.getString("Location"));
                     tmp.add(resultType);
                     System.out.println(tmp);
                 }
                 return tmp;
             }
-        });
+        },name);
         return result;
     }
-
-    //need to care for sql injection attacks
     public List<ResultType> getContact(String name) {
-        final String sql = "SELECT * FROM Contacts WHERE City = 'toronto'";
+        final String sql = "SELECT * FROM Contacts WHERE Location = ?";
         List<ResultType> result = jdbcTemplate.query(sql, new ResultSetExtractor<List<ResultType>>() {
             @Override
             public List<ResultType> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -72,16 +50,17 @@ public class AWS_RDS_dao {
                     ResultType resultType = new ResultType();
                     resultType.setId(resultSet.getInt("id"));
                     resultType.setName(resultSet.getString("Name"));
-                    resultType.setCompany(resultSet.getString("Company"));
-                    resultType.setPhone(resultSet.getString("Phone-number"));
+                    resultType.setCompany(resultSet.getString("Organization"));
+                    resultType.setPhone(resultSet.getString("Phone"));
                     resultType.setEmail(resultSet.getString("Email"));
-                    resultType.setCity(resultSet.getString("City"));
+                    resultType.setCity(resultSet.getString("Location"));
                     tmp.add(resultType);
                     System.out.println(tmp);
                 }
                 return tmp;
             }
-        });
+        },name);
         return result;
     }
+
 }

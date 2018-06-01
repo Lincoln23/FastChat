@@ -26,7 +26,6 @@ public class AWS_Service {
     AWS_RDS_dao aws_rds_dao;
 
 
-
     public List<List<ResultType>> comprehend(String text) {
         List<Entity> list;
         List<KeyPhrase> keyList;
@@ -38,8 +37,8 @@ public class AWS_Service {
 
 
         //AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
-        BasicAWSCredentials awsCreds = new BasicAWSCredentials("access Key" ,
-                "secretKey");
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials("Acess key",
+                "secret key");
 
         AmazonComprehend comprehendClient =
                 AmazonComprehendClientBuilder.standard()
@@ -70,21 +69,27 @@ public class AWS_Service {
         System.out.println("ListEntities" + list);
         System.out.println("KeyList" + keyList);
         List<List<ResultType>> result = new ArrayList<>();
-        for (int i =0 ; i < list.size(); i++) {
-            if (list.get(i).getType().equals("ORGANIZATION")) {
-                try{
-                    result.add(aws_rds_dao.getCompanies(list.get(i).getText()));
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-            else if(list.get(i).getType().equals("LOCATION")){
-                try{
-                    System.out.println("in here");
-                    result.add(aws_rds_dao.getContact(list.get(i).getText()));
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
+        String string = null;
+        for (int i = 0; i < list.size(); i++) {
+            string = list.get(i).getType();
+            System.out.println(string);
+            switch (string) {
+                case "ORGANIZATION" :
+                    try {
+                        result.add(aws_rds_dao.getCompanies("Organization",list.get(i).getText()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case "LOCATION":
+                    try {
+                        result.add(aws_rds_dao.getContact(list.get(i).getText()));
+                        result.add(aws_rds_dao.getCompanies("Location",list.get(i).getText()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
             }
         }
         return result;
