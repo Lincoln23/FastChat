@@ -42,7 +42,7 @@ public class AWS_RDS_dao {
 //    }
 
     public List<ResultType> getCompanies(String name) {
-        final String sql = "SELECT * FROM Companies WHERE Name = '" + name + "'";
+        final String sql = "SELECT * FROM Companies WHERE Name = ?";
         final List<ResultType> result = jdbcTemplate.query(sql, new ResultSetExtractor<List<ResultType>>() {
             @Override
             public List<ResultType> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
