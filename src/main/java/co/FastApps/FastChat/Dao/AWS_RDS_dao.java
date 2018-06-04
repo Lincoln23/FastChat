@@ -1,18 +1,11 @@
 package co.FastApps.FastChat.Dao;
 
-import co.FastApps.FastChat.Entity.ResultType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository("mysql")
@@ -20,47 +13,32 @@ public class AWS_RDS_dao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<ResultType> getCompanies(String Type, String name) {
-        final String sql = "SELECT * FROM Companies WHERE " + Type + " = + ?";
-        final List<ResultType> result = jdbcTemplate.query(sql, new ResultSetExtractor<List<ResultType>>() {
-            @Override
-            public List<ResultType> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                List<ResultType> tmp = new ArrayList<>();
-                while(resultSet.next()) {
-                    ResultType resultType = new ResultType();
-                    resultType.setId(resultSet.getInt("id"));
-                    resultType.setName(resultSet.getString("Organization"));
-                    resultType.setDateFounded(resultSet.getString("date-Founded"));
-                    resultType.setCity(resultSet.getString("Location"));
-                    tmp.add(resultType);
-                    System.out.println(tmp);
-                }
-                return tmp;
-            }
-        },name);
+        public List<Map<String, Object>> getInfo(String table, String Type, String name) {
+        final String sql = "SELECT * FROM " + table + " WHERE " + Type + " = ?";
+        System.out.println(sql);
+        final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
+        if (result.isEmpty()){
+            return  null;
+        }
         return result;
     }
-    public List<ResultType> getContact(String name) {
-        final String sql = "SELECT * FROM Contacts WHERE Location = ?";
-        List<ResultType> result = jdbcTemplate.query(sql, new ResultSetExtractor<List<ResultType>>() {
-            @Override
-            public List<ResultType> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                List<ResultType> tmp = new ArrayList<>();
-                while (resultSet.next()){
-                    ResultType resultType = new ResultType();
-                    resultType.setId(resultSet.getInt("id"));
-                    resultType.setName(resultSet.getString("Name"));
-                    resultType.setCompany(resultSet.getString("Organization"));
-                    resultType.setPhone(resultSet.getString("Phone"));
-                    resultType.setEmail(resultSet.getString("Email"));
-                    resultType.setCity(resultSet.getString("Location"));
-                    tmp.add(resultType);
-                    System.out.println(tmp);
-                }
-                return tmp;
-            }
-        },name);
-        return result;
-    }
+
+//    public List<Map<String, Object>> getCompanies(String Type, String name) {
+//        final String sql = "SELECT * FROM Companies WHERE " + Type + " = + ?";
+//        final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
+//        return result;
+//    }
+//
+//    public List<Map<String, Object>> getContacts(String Type, String name) {
+//        final String sql = "SELECT * FROM Contacts WHERE" + Type + " = ?";
+//        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
+//        return result;
+//    }
+//
+//    public List<Map<String, Object>> getEmployees(String Type, String name) {
+//        final String sql = "SELECT * FROM Employees WHERE" + Type + " = ?";
+//        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
+//        return result;
+//    }
 
 }
