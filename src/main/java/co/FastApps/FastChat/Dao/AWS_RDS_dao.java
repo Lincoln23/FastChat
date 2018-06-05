@@ -3,7 +3,7 @@ package co.FastApps.FastChat.Dao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,32 +13,24 @@ public class AWS_RDS_dao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-        public List<Map<String, Object>> getInfo(String table, String Type, String name) {
-        final String sql = "SELECT * FROM " + table + " WHERE " + Type + " = ?";
-        System.out.println(sql);
-        final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
-        if (result.isEmpty()){
-            return  null;
+    public List<Map<String, Object>> getInfo(String table, String cName, String name) {
+        final String sql = "SELECT * FROM " + table + " WHERE " + cName + " = ?";
+        final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, name);
+        if (result.isEmpty()) {
+            return null;
         }
+
+        for (int i = 0; i < result.size(); i++) {
+            switch(table){
+                case "Employees":
+                    String s = "Name: " + result.get(i).get("Name") + " Phone: " + result.get(i).get("Phone") +
+                            " Email: " + result.get(i).get("Email") + " Employee id: " + result.get(i).get
+                            ("Employee-id");
+                    result.get(i).put("Plain Text", s);
+            }
+            result.get(i).put("Table", table);
+        }
+
         return result;
     }
-
-//    public List<Map<String, Object>> getCompanies(String Type, String name) {
-//        final String sql = "SELECT * FROM Companies WHERE " + Type + " = + ?";
-//        final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
-//        return result;
-//    }
-//
-//    public List<Map<String, Object>> getContacts(String Type, String name) {
-//        final String sql = "SELECT * FROM Contacts WHERE" + Type + " = ?";
-//        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
-//        return result;
-//    }
-//
-//    public List<Map<String, Object>> getEmployees(String Type, String name) {
-//        final String sql = "SELECT * FROM Employees WHERE" + Type + " = ?";
-//        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql,name);
-//        return result;
-//    }
-
 }

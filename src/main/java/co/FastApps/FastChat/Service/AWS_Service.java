@@ -12,31 +12,23 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Service
 public class AWS_Service {
-
     @Autowired
     @Qualifier("mysql")
     AWS_RDS_dao aws_rds_dao;
 
-
     public List<List<Map<String, Object>>> comprehend(String text) {
         List<Entity> list;
-        List<KeyPhrase> keyList;
+ //       List<KeyPhrase> keyList;
 
-//        DefaultAWSCredentialsProviderChain awsCreds = new DefaultAWSCredentialsProviderChain();
-//
-//        EnvironmentVariableCredentialsProvider env = new EnvironmentVariableCredentialsProvider();
-//        env.getCredentials();
-
-
-        //AWSCredentialsProvider awsCreds = DefaultAWSCredentialsProviderChain.getInstance();
         BasicAWSCredentials awsCreds = new BasicAWSCredentials("access key",
-                "secret key");
+                "secret Key");
 
         AmazonComprehend comprehendClient =
                 AmazonComprehendClientBuilder.standard()
@@ -48,123 +40,151 @@ public class AWS_Service {
         DetectEntitiesRequest detectEntitiesRequest = new DetectEntitiesRequest().withText(text)
                 .withLanguageCode("en");
         // Call detectKeyPhrases API
-        DetectKeyPhrasesRequest detectKeyPhrasesRequest = new DetectKeyPhrasesRequest().withText(text)
-                .withLanguageCode("en");
+//        DetectKeyPhrasesRequest detectKeyPhrasesRequest = new DetectKeyPhrasesRequest().withText(text)
+//                .withLanguageCode("en");
         //Entities Result
         DetectEntitiesResult detectEntitiesResult = comprehendClient.detectEntities(detectEntitiesRequest);
         //KeyPhrases Result
-        DetectKeyPhrasesResult detectKeyPhrasesResult = comprehendClient.detectKeyPhrases(detectKeyPhrasesRequest);
+//        DetectKeyPhrasesResult detectKeyPhrasesResult = comprehendClient.detectKeyPhrases(detectKeyPhrasesRequest);
 
-        keyList = detectKeyPhrasesResult.getKeyPhrases();
-        //removes duplicates from keylist
+//        keyList = detectKeyPhrasesResult.getKeyPhrases();
         list = detectEntitiesResult.getEntities();
-        for (int i = 0; i < keyList.size(); i++) {
-            for (int j = 0; j < list.size(); j++) {
-                if (list.get(j).getText().equals(keyList.get(i).getText())) {
-                    keyList.remove(i);
-                }
-            }
-        }
-        //use muti demsional array
-        //use map interface entity is the key and the information are the values
+
+
+        //removes duplicates from keylist
+//        @Deprecated
+//        for (int i = 0; i < keyList.size(); i++) {
+//            for (int j = 0; j < list.size(); j++) {
+//                if (list.get(j).getText().equals(keyList.get(i).getText())) {
+//                    keyList.remove(i);
+//                }
+//            }
+//        }
+//      System.out.println("KeyList" + keyList);
         System.out.println("ListEntities" + list);
-        System.out.println("KeyList" + keyList);
+
+
+
+        Map<String, String> map = new HashMap<>();
         List<List<Map<String, Object>>> result = new ArrayList<>();
-        String string = null;
-        for (int i = 0; i < list.size(); i++) {
-            string = list.get(i).getType();
+        for (Entity entity : list) {
+            String string = entity.getType();
             System.out.println(string);
             switch (string) {
                 case "ORGANIZATION":
                     try {
-                        System.out.println("In Organiztion");
-
-                        if (aws_rds_dao.getInfo("Companies", "Organization", list.get(i).getText()) != null)
-                            result.add(aws_rds_dao.getInfo("Companies", "Organization", list.get(i).getText()));
-
-                        if (aws_rds_dao.getInfo("Companies", "Organization", list.get(i).getText()) != null)
-                            result.add(aws_rds_dao.getInfo("Companies", "Organization", list.get(i).getText()));
-
-                        if (aws_rds_dao.getInfo("Contacts", "Organization", list.get(i).getText()) != null)
-                            result.add(aws_rds_dao.getInfo("Contacts", "Organization", list.get(i).getText()));
-
-                        result.add(aws_rds_dao.getInfo("Calls", "Organization", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Assets", "Organization", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Countries", "Organization", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Leads", "Organization", list.get(i).getText()));
+                        map.put("Companies", "Organization");
+                        map.put("Contacts", "Organization");
+                        map.put("Calls", "Organization");
+                        map.put("Assets", "Organization");
+                        map.put("Countries", "Organization");
+                        map.put("Leads", "Organization");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "LOCATION":
                     try {
-                        System.out.println("In LOCATION");
-                        result.add(aws_rds_dao.getInfo("Companies", "Location", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Contacts", "Location", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Employees", "Location", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Countries", "City", list.get(i).getText()));
+                        map.put("Companies", "Location");
+                        map.put("Contacts", "Location");
+                        map.put("Employees", "Location");
+                        map.put("Countries", "City");
+
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "DATE":
                     try {
-//                        TODO Fix timezone
-                        System.out.println("In DATE");
-                        result.add(aws_rds_dao.getInfo("Employees", "Birthday", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Calls", "Date", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Documents", "Date", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Leads", "Date", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Meeting", "Date", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Projects", "Start", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Projects", "End", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Tasks", "Date", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Events", "Date", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Expenses", "Date", list.get(i).getText()));
+                        map.put("Employees", "Birthday");
+                        map.put("Calls", "Date");
+                        map.put("Documents", "Date");
+                        map.put("Leads", "Date");
+                        map.put("Meeting", "Date");
+                        map.put("Projects", "Start");
+                        map.put("Projects", "End");
+                        map.put("Tasks", "Date");
+                        map.put("Events", "Date");
+                        map.put("Expenses", "Date");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "QUANTITY":
                     try {
-                        System.out.println("In QUANTITY");
-                        result.add(aws_rds_dao.getInfo("Expenses", "Cost", list.get(i).getText()));
+                        map.put("Expenses", "Cost");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "PERSON":
                     try {
-                        System.out.println("In PERSON");
-                        result.add(aws_rds_dao.getInfo("Employees", "Name", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Assets", "Name", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Contacts", "Name", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Calls", "Name", list.get(i).getText()));
-                        result.add(aws_rds_dao.getInfo("Leads", "Name", list.get(i).getText()));
+                        map.put("Employees", "Name");
+                        map.put("Assets", "Name");
+                        map.put("Contacts", "Name");
+                        map.put("Calls", "Name");
+                        map.put("Leads", "Name");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "EVENT":
                     try {
-                        System.out.println("In EVENT");
-                        result.add(aws_rds_dao.getInfo("Events", "Name", list.get(i).getText()));
+                        map.put("Events", "Name");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "COMMERCIAL_ITEM":
                     try {
-                        System.out.println("In COMMERCIAL_ITEM");
-                        result.add(aws_rds_dao.getInfo("Companies", "Name", list.get(i).getText()));
+                        map.put("Companies", "Name");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     break;
                 case "TITLE":
                     try {
-                        System.out.println("In TITLE");
-                        result.add(aws_rds_dao.getInfo("Employees", "Title", list.get(i).getText()));
+                        map.put("Employees", "Title");
+                        for (Map.Entry<String, String> entry : map.entrySet()) {
+                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
+                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
+                        }
+                        map.clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

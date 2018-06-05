@@ -1,5 +1,6 @@
 package co.FastApps.FastChat.Entity;
 
+@Deprecated
 public class ResultType {
     private int id;
     private String name;
