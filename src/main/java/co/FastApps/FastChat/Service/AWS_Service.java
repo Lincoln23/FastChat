@@ -1,6 +1,7 @@
 package co.FastApps.FastChat.Service;
 
 import co.FastApps.FastChat.Dao.AWS_RDS_dao;
+import co.FastApps.FastChat.Entity.Result;
 import com.amazonaws.auth.*;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.comprehend.AmazonComprehend;
@@ -25,10 +26,10 @@ public class AWS_Service {
 
     public List<List<Map<String, Object>>> comprehend(String text) {
         List<Entity> list;
- //       List<KeyPhrase> keyList;
+        //       List<KeyPhrase> keyList;
 
-        BasicAWSCredentials awsCreds = new BasicAWSCredentials("access key",
-                "secret Key");
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials("key",
+                "key");
 
         AmazonComprehend comprehendClient =
                 AmazonComprehendClientBuilder.standard()
@@ -62,6 +63,32 @@ public class AWS_Service {
 //        }
 //      System.out.println("KeyList" + keyList);
         System.out.println("ListEntities" + list);
+
+
+//        Result result = new Result();
+//        Map<String,Result> resultMap = new HashMap<>();
+//        resultMap.put("COMMERCIAL_ITEM",result);
+//        resultMap.put("DATE",result);
+//        resultMap.put("EVENT",result);
+//        resultMap.put("LOCATION",result);
+//        resultMap.put("ORGANIZATION",result);
+//        resultMap.put("OTHER",result);
+//        resultMap.put("PERSON",result);
+//        resultMap.put("COMMERCIAL_ITEM",result);
+//        resultMap.put("TITLE",result);
+//
+//        for (Entity entity : list) {
+//            for(Map.Entry<String,Result> entry : resultMap.entrySet()){
+//                if(entity.getType().equals(entry.getKey())){
+//                    entry.getValue().location(entity.getText());
+//                }
+//            }
+//        }
+//        return result.returnList();
+
+
+
+
 
 
 

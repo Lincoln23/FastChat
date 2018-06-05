@@ -10,22 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/Select")
+@RequestMapping
 public class AWS_Controller {
 
     @Autowired
     private AWS_Service aws_service;
 
-//    @RequestMapping(method = RequestMethod.GET)
-//    public List<ResultType> getEverything(){
-//        return aws_service.getEverything();
-//    }
     @RequestMapping(value = "/{text}", method = RequestMethod.GET)
     public List<List<Map<String, Object>>> listEntity(@PathVariable("text")String text){
         return this.aws_service.comprehend(text);
     }
-//    @RequestMapping(method = RequestMethod.GET)
-//    public List<List<Map<String, Object>>> listEntity(){
-//        return this.aws_service.comprehend("hi");
-//    }
+
 }
