@@ -1,19 +1,20 @@
 package co.FastApps.FastChat.Service;
 
 import co.FastApps.FastChat.Dao.AWS_RDS_dao;
-import co.FastApps.FastChat.Entity.Result;
-import com.amazonaws.auth.*;
+import co.FastApps.FastChat.Entity.EndResult;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.comprehend.AmazonComprehend;
 import com.amazonaws.services.comprehend.AmazonComprehendClientBuilder;
 import com.amazonaws.services.comprehend.model.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +23,21 @@ import java.util.Map;
 public class AWS_Service {
     @Autowired
     @Qualifier("mysql")
-    AWS_RDS_dao aws_rds_dao;
+    private AWS_RDS_dao aws_rds_dao;
 
-    public List<List<Map<String, Object>>> comprehend(String text) {
+    private void query(ListMultimap<String, String> multiMap, String text, List<List<Map<String, Object>>> result) {
+        for (String key : multiMap.keySet()) {
+            List<String> value = multiMap.get(key);
+            for (String val : value) {
+                if (aws_rds_dao.testNotNull(key, val, text) != null)
+                    result.add(aws_rds_dao.getInfo(key, val, text));
+            }
+        }
+    }
+
+    public EndResult comprehend(String text) {
         List<Entity> list;
-        //       List<KeyPhrase> keyList;
+        List<KeyPhrase> keyList;
 
         BasicAWSCredentials awsCreds = new BasicAWSCredentials("key",
                 "key");
@@ -41,185 +52,138 @@ public class AWS_Service {
         DetectEntitiesRequest detectEntitiesRequest = new DetectEntitiesRequest().withText(text)
                 .withLanguageCode("en");
         // Call detectKeyPhrases API
-//        DetectKeyPhrasesRequest detectKeyPhrasesRequest = new DetectKeyPhrasesRequest().withText(text)
-//                .withLanguageCode("en");
+        DetectKeyPhrasesRequest detectKeyPhrasesRequest = new DetectKeyPhrasesRequest().withText(text)
+                .withLanguageCode("en");
         //Entities Result
         DetectEntitiesResult detectEntitiesResult = comprehendClient.detectEntities(detectEntitiesRequest);
         //KeyPhrases Result
-//        DetectKeyPhrasesResult detectKeyPhrasesResult = comprehendClient.detectKeyPhrases(detectKeyPhrasesRequest);
+        DetectKeyPhrasesResult detectKeyPhrasesResult = comprehendClient.detectKeyPhrases(detectKeyPhrasesRequest);
 
-//        keyList = detectKeyPhrasesResult.getKeyPhrases();
+        keyList = detectKeyPhrasesResult.getKeyPhrases();
         list = detectEntitiesResult.getEntities();
 
 
         //removes duplicates from keylist
-//        @Deprecated
-//        for (int i = 0; i < keyList.size(); i++) {
-//            for (int j = 0; j < list.size(); j++) {
-//                if (list.get(j).getText().equals(keyList.get(i).getText())) {
-//                    keyList.remove(i);
-//                }
-//            }
-//        }
-//      System.out.println("KeyList" + keyList);
+        for (int i = 0; i < keyList.size(); i++) {
+            for (Entity aList : list) {
+                if (aList.getText().equals(keyList.get(i).getText())) {
+                    keyList.remove(i);
+                }
+            }
+        }
+        System.out.println("KeyList" + keyList);
         System.out.println("ListEntities" + list);
 
 
-//        Result result = new Result();
-//        Map<String,Result> resultMap = new HashMap<>();
-//        resultMap.put("COMMERCIAL_ITEM",result);
-//        resultMap.put("DATE",result);
-//        resultMap.put("EVENT",result);
-//        resultMap.put("LOCATION",result);
-//        resultMap.put("ORGANIZATION",result);
-//        resultMap.put("OTHER",result);
-//        resultMap.put("PERSON",result);
-//        resultMap.put("COMMERCIAL_ITEM",result);
-//        resultMap.put("TITLE",result);
-//
-//        for (Entity entity : list) {
-//            for(Map.Entry<String,Result> entry : resultMap.entrySet()){
-//                if(entity.getType().equals(entry.getKey())){
-//                    entry.getValue().location(entity.getText());
-//                }
-//            }
-//        }
-//        return result.returnList();
-
-
-
-
-
-
-
-        Map<String, String> map = new HashMap<>();
+//       TODO logging, exception, errors
+        aws_rds_dao.clearRootText();
+        ListMultimap<String, String> multiMap = ArrayListMultimap.create();
         List<List<Map<String, Object>>> result = new ArrayList<>();
         for (Entity entity : list) {
             String string = entity.getType();
-            System.out.println(string);
             switch (string) {
                 case "ORGANIZATION":
+                    multiMap.put("Companies", "Organization");
+                    multiMap.put("Contacts", "Organization");
+                    multiMap.put("Calls", "Organization");
+                    multiMap.put("Assets", "Organization");
+                    multiMap.put("Countries", "Organization");
+                    multiMap.put("Leads", "Organization");
                     try {
-                        map.put("Companies", "Organization");
-                        map.put("Contacts", "Organization");
-                        map.put("Calls", "Organization");
-                        map.put("Assets", "Organization");
-                        map.put("Countries", "Organization");
-                        map.put("Leads", "Organization");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "LOCATION":
+                    multiMap.put("Companies", "Location");
+                    multiMap.put("Contacts", "Location");
+                    multiMap.put("Employees", "Location");
+                    multiMap.put("Countries", "City");
                     try {
-                        map.put("Companies", "Location");
-                        map.put("Contacts", "Location");
-                        map.put("Employees", "Location");
-                        map.put("Countries", "City");
-
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "DATE":
+                    multiMap.put("Employees", "Birthday");
+                    multiMap.put("Calls", "Date");
+                    multiMap.put("Documents", "Date");
+                    multiMap.put("Leads", "Date");
+                    multiMap.put("Meeting", "Date");
+                    multiMap.put("Projects", "Start");
+                    multiMap.put("Projects", "End");
+                    multiMap.put("Tasks", "Date");
+                    multiMap.put("Events", "Date");
+                    multiMap.put("Expenses", "Date");
                     try {
-                        map.put("Employees", "Birthday");
-                        map.put("Calls", "Date");
-                        map.put("Documents", "Date");
-                        map.put("Leads", "Date");
-                        map.put("Meeting", "Date");
-                        map.put("Projects", "Start");
-                        map.put("Projects", "End");
-                        map.put("Tasks", "Date");
-                        map.put("Events", "Date");
-                        map.put("Expenses", "Date");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "QUANTITY":
+                    multiMap.put("Expenses", "Cost");
                     try {
-                        map.put("Expenses", "Cost");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "PERSON":
+                    multiMap.put("Employees", "Name");
+                    multiMap.put("Assets", "Name");
+                    multiMap.put("Contacts", "Name");
+                    multiMap.put("Calls", "Name");
+                    multiMap.put("Leads", "Name");
                     try {
-                        map.put("Employees", "Name");
-                        map.put("Assets", "Name");
-                        map.put("Contacts", "Name");
-                        map.put("Calls", "Name");
-                        map.put("Leads", "Name");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "EVENT":
+                    multiMap.put("Events", "Name");
                     try {
-                        map.put("Events", "Name");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "COMMERCIAL_ITEM":
+                    multiMap.put("Companies", "Name");
                     try {
-                        map.put("Companies", "Name");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 case "TITLE":
+                    multiMap.put("Employees", "Title");
                     try {
-                        map.put("Employees", "Title");
-                        for (Map.Entry<String, String> entry : map.entrySet()) {
-                            if (aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()) != null)
-                                result.add(aws_rds_dao.getInfo(entry.getKey(), entry.getValue(), entity.getText()));
-                        }
-                        map.clear();
+                        query(multiMap, entity.getText(), result);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    multiMap.clear();
                     break;
                 default:
                     System.out.println("didn't go into a switch case");
             }
         }
-        return result;
+        return new EndResult(result, aws_rds_dao.getRootText());
     }
 }
