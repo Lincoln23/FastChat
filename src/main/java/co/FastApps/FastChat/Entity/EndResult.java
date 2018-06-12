@@ -7,7 +7,8 @@ public class EndResult {
     private List<List<Map<String, Object>>> resultList;
     private String plainText;
 
-    public EndResult(List<List<Map<String, Object>>> resultList, String plainText) {
+
+	public EndResult(List<List<Map<String, Object>>> resultList, String plainText) {
         this.resultList = resultList;
         this.plainText = plainText;
     }
