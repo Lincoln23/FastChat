@@ -14,14 +14,17 @@ public class AWS_RDS_dao {
 	private JdbcTemplate jdbcTemplate;
 	private StringBuilder rootText = new StringBuilder();
 
+	//builds the root text message
 	public String getRootText() {
 		return this.rootText.toString();
 	}
 
+	//clears the root text message
 	public void clearRootText() {
 		rootText.setLength(0);
 	}
 
+	//check if the results return is null from Database
 	public String testNotNull(String table, String cName, String name) {
 		final String sql = "SELECT * FROM " + table + " WHERE " + cName + " = ?";
 		final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, name);
@@ -31,6 +34,7 @@ public class AWS_RDS_dao {
 		return "worked";
 	}
 
+	//query the database for results and build a shorten string message from the data
 	public List<Map<String, Object>> getInfo(String table, String cName, String name) {
 		final String sql = "SELECT * FROM " + table + " WHERE " + cName + " = ?";
 		final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, name);
@@ -97,6 +101,14 @@ public class AWS_RDS_dao {
 					rootText.append("The event upcoming is: ").append(aResult.get("Name")).append(" on ").append(aResult.get
 							("Date")).append(".");
 					break;
+				case "Inventory":
+					s = "Name: " + aResult.get("Name") + "; Date purchased: " + aResult.get("Date purchased") +
+							"; Quantity: " + aResult.get("Quantity");
+					aResult.put("Plain Text", s);
+
+					rootText.append("The Inventory for: ").append(aResult.get("Name")).append(" is ").append(aResult.get
+							("Quantity")).append(".");
+					break;
 				case "Expenses":
 					s = "Name: " + aResult.get("Name") + "; Cost: " + aResult.get("Cost") +
 							"; Description: " + aResult.get("Description");
@@ -144,6 +156,7 @@ public class AWS_RDS_dao {
 					s = "Cannot create a plain sentence";
 					aResult.put("Error", s);
 			}
+			//puts the table name in the object
 			aResult.put("Table", table);
 		}
 		return result;

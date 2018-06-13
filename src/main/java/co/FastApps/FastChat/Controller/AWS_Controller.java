@@ -16,9 +16,10 @@ public class AWS_Controller {
     @Autowired
     private AWS_Service aws_service;
 
-    @RequestMapping(value = "/{text}", method = RequestMethod.GET)
-    public EndResult listEntity(@PathVariable("text") String text) {
-        return this.aws_service.comprehend(text);
-    }
+	//send a get request to ....8080/{your message}
+	@RequestMapping(value = "/{text}", method = RequestMethod.GET)
+	EndResult listEntity(@PathVariable("text") String text) {
+		return this.aws_service.comprehend(text);
+	}
 
 }

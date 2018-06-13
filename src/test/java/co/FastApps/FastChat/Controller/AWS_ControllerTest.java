@@ -27,6 +27,7 @@ public class AWS_ControllerTest {
 		EndResult outcome = aws_controller.listEntity(inputText);
 		assertThat(outcome.getPlainText(), is(equalTo("The Country for Amazon is located in Canada.The company is: Amazon.The company is: Amazon.The call you have is with: Bob from Amazon at 2110-06-01 04:04:34.0.The Lead is: Jim from Amazon.The Contact info I found is: Bob, You can contact him/her at 647-548-4549 and by email at Bob@amazon.ca.The Asset is Bob  and it says: lead for AWS Comprehend.")));
 
+
 		assertThat(outcome.getResultList().get(0).get(0).get("Organization"), is(equalTo("Amazon")));
 	}
 
@@ -73,6 +74,27 @@ public class AWS_ControllerTest {
 
 		assertThat(outcome.getResultList().get(0).get(0).get("Name"), is(equalTo("Lincoln")));
 	}
+
+	@Test
+	public void testControllerEvent() {
+		String inputText = "tell me about St Patrick's Day";
+
+		EndResult outcome = aws_controller.listEntity(inputText);
+		assertThat(outcome.getPlainText(), is(equalTo("The event upcoming is: St Patrick's Day on 2057-08-16.")));
+
+		assertThat(outcome.getResultList().get(0).get(0).get("Name"), is(equalTo("St Patrick's Day")));
+	}
+
+	@Test
+	public void testControllerCOMMERCIAL_ITEM() {
+		String inputText = "how many qc35 do we own";
+
+		EndResult outcome = aws_controller.listEntity(inputText);
+		assertThat(outcome.getPlainText(), is(equalTo("The Inventory for: qc35 is 34.")));
+
+		assertThat(outcome.getResultList().get(0).get(0).get("Name"), is(equalTo("qc35")));
+	}
+
 
 
 }

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-//TODO Unit testing
+//TODO have a mapping for keyLIst? ie.CEO CTO and other stuff that entities doesn't deetect
 @Service
 public class AWS_Service {
 	@Autowired
@@ -72,7 +72,7 @@ public class AWS_Service {
 			}
 		}
 		System.out.println("KeyList" + keyList);
-		System.out.println("ListEntities" + list);
+		System.out.println("ListEntities" + list + "\n");
 
 
 		aws_rds_dao.clearRootText();
@@ -82,6 +82,7 @@ public class AWS_Service {
 			String string = entity.getType();
 			switch (string) {
 				case "ORGANIZATION":
+					//Put key and values corresponding to table and column
 					multiMap.put("Companies", "Organization");
 					multiMap.put("Contacts", "Organization");
 					multiMap.put("Calls", "Organization");
@@ -161,7 +162,7 @@ public class AWS_Service {
 					multiMap.clear();
 					break;
 				case "COMMERCIAL_ITEM":
-					multiMap.put("Companies", "Name");
+					multiMap.put("Inventory", "Name");
 					try {
 						query(multiMap, entity.getText(), result);
 
@@ -171,7 +172,7 @@ public class AWS_Service {
 					multiMap.clear();
 					break;
 				case "TITLE":
-					multiMap.put("Employees", "Title");
+					multiMap.put("Employees ", "Title");
 					try {
 						query(multiMap, entity.getText(), result);
 
