@@ -13,12 +13,13 @@ import java.util.TimeZone;
 @SpringBootApplication
 public class FastChatApplication extends SpringBootServletInitializer {
 
-	private static final Logger logger = LoggerFactory.getLogger(FastChatApplication.class);
+	public static final Logger logger = LoggerFactory.getLogger(FastChatApplication.class);
 
 	@PostConstruct
-	public void init(){
+	public void init() {
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));   // It will set UTC timezone
 	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(FastChatApplication.class, args);
 		logger.debug("--Application Started--");

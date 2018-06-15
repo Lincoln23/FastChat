@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,14 +25,16 @@ public class AWS_RDS_dao {
 		rootText.setLength(0);
 	}
 
-	//check if the results return is null from Database
-	public String testNotNull(String table, String cName, String name) {
-		final String sql = "SELECT * FROM " + table + " WHERE " + cName + " = ?";
-		final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, name);
-		if (result.isEmpty()) {
-			return null;
+	public List<String> getColumnName(String table) {
+		final String sql = "SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema='ChatBotDevDb' AND " +
+				"table_name=?";
+		final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, table);
+		System.out.println(result);
+		List<String> columnName = new ArrayList<>();
+		for (Map<String, Object> map : result) {
+			columnName.add((String) map.get("COLUMN_NAME"));
 		}
-		return "worked";
+		return columnName;
 	}
 
 	//query the database for results and build a shorten string message from the data

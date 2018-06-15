@@ -2,6 +2,7 @@ package co.FastApps.FastChat.Service;
 
 import co.FastApps.FastChat.Dao.AWS_RDS_dao;
 import co.FastApps.FastChat.Entity.EndResult;
+import co.FastApps.FastChat.FastChatApplication;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
@@ -12,35 +13,72 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-//TODO have a mapping for keyLIst? ie.CEO CTO and other stuff that entities doesn't deetect
+//TODO have a mapping for keyLIst? ie.CEO CTO and other stuff that entities doesn't detect
 @Service
 public class AWS_Service {
 	@Autowired
 	@Qualifier("mysql")
 	private AWS_RDS_dao aws_rds_dao;
 
-	private void query(ListMultimap<String, String> multiMap, String text, List<List<Map<String, Object>>> result) {
+	@Value("${AWS_ACCESS_KEY}")
+	private String accessKey;
+
+	@Value("${AWS_SECRET_KEY}")
+	private String secretKey;
+
+
+	private List<String> intersection(List<String> textArray, List<String> columnNames) {
+		List<String> list = new ArrayList<>();
+		for (String text : columnNames) {
+			for (String columnName : textArray) {
+				if (text.equalsIgnoreCase(columnName)) {
+					list.add(text);
+				}
+			}
+		}
+		return list;
+	}
+
+	private void query(ListMultimap<String, String> multiMap, String text, List<List<Map<String, Object>>> result, int limit) {
 		for (String key : multiMap.keySet()) {
 			List<String> value = multiMap.get(key);
 			for (String val : value) {
-				if (aws_rds_dao.testNotNull(key, val, text) != null)
-					result.add(aws_rds_dao.getInfo(key, val, text));
+				List<Map<String, Object>> tmp = aws_rds_dao.getInfo(key, val, text);
+				if (tmp != null && result.size() < limit) {
+					result.add(tmp);
+				}
 			}
 		}
 	}
 
-	public EndResult comprehend(String text) {
+	private void addNewValues(ListMultimap<String, String> multiMap, List<String> textArray) {
+		for (String key : multiMap.keySet()) {
+			List<String> columnNames = aws_rds_dao.getColumnName(key);
+			System.out.println(columnNames);
+			List<String> commonList = intersection(textArray, columnNames);
+			System.out.println(columnNames);
+			for (String put : commonList) {
+				if (!multiMap.containsValue(put)) {
+					multiMap.put(key, put);
+				}
+			}
+			System.out.println(multiMap);
+		}
+	}
+
+	public EndResult comprehend(String text, int limit) {
 		List<Entity> list;
 		List<KeyPhrase> keyList;
 
-		BasicAWSCredentials awsCreds = new BasicAWSCredentials("key",
-				"key");
+		BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKey, secretKey);
 
 		AmazonComprehend comprehendClient =
 				AmazonComprehendClientBuilder.standard()
@@ -62,7 +100,6 @@ public class AWS_Service {
 		keyList = detectKeyPhrasesResult.getKeyPhrases();
 		list = detectEntitiesResult.getEntities();
 
-
 		//removes duplicates from keylist
 		for (int i = 0; i < keyList.size(); i++) {
 			for (Entity aList : list) {
@@ -78,6 +115,7 @@ public class AWS_Service {
 		aws_rds_dao.clearRootText();
 		ListMultimap<String, String> multiMap = ArrayListMultimap.create();
 		List<List<Map<String, Object>>> result = new ArrayList<>();
+		List<String> textArray = Arrays.asList(text.split("\\s+"));
 		for (Entity entity : list) {
 			String string = entity.getType();
 			switch (string) {
@@ -89,9 +127,11 @@ public class AWS_Service {
 					multiMap.put("Assets", "Organization");
 					multiMap.put("Countries", "Organization");
 					multiMap.put("Leads", "Organization");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
@@ -101,9 +141,11 @@ public class AWS_Service {
 					multiMap.put("Contacts", "Location");
 					multiMap.put("Employees", "Location");
 					multiMap.put("Countries", "City");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
@@ -119,20 +161,24 @@ public class AWS_Service {
 					multiMap.put("Tasks", "Date");
 					multiMap.put("Events", "Date");
 					multiMap.put("Expenses", "Date");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
 					break;
 				case "QUANTITY":
-					String s = entity.getText().replaceAll("\\W", "");
+					String s = entity.getText().replaceAll("\\D+", "");
 					multiMap.put("Expenses", "Cost");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, s, result);
+						query(multiMap, s, result, limit);
 
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
@@ -143,40 +189,48 @@ public class AWS_Service {
 					multiMap.put("Contacts", "Name");
 					multiMap.put("Calls", "Name");
 					multiMap.put("Leads", "Name");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
 					break;
 				case "EVENT":
 					multiMap.put("Events", "Name");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
 					break;
 				case "COMMERCIAL_ITEM":
 					multiMap.put("Inventory", "Name");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
 					break;
 				case "TITLE":
 					multiMap.put("Employees ", "Title");
+					addNewValues(multiMap, textArray);
 					try {
-						query(multiMap, entity.getText(), result);
+						query(multiMap, entity.getText(), result, limit);
 
 					} catch (Exception e) {
+						FastChatApplication.logger.debug(e.toString());
 						e.printStackTrace();
 					}
 					multiMap.clear();
