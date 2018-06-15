@@ -49,111 +49,124 @@ public class AWS_RDS_dao {
 				case "Assets":
 					String s = "Name: " + aResult.get("Name") + "; Organization: " + aResult.get("Organization") +
 							"; Description: " + aResult.get("Description");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The Asset is ").append(aResult.get("Name")).append(" and it says: ").append(aResult.get("Description")).append(".");
+					rootText.append("Here is what I found in Assets: ").append(aResult.get("Name")).append(" with ")
+							.append(aResult.get("Organization")).append(" with the following description: ").append(aResult.get("Description"))
+							.append(". ");
 					break;
 				case "Calls":
 					s = "Name: " + aResult.get("Name") + "; Date: " + aResult.get("Date") +
 							"; Organization: " + aResult.get("Organization");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The call you have is with: ").append(aResult.get("Name")).append(" from ").append(aResult.get("Organization")).append(" at ").append(aResult.get("Date")).append(".");
+					rootText.append("Here is what I found in Calls: ").append(aResult.get("Name")).append(" with ")
+							.append(aResult.get("Organization")).append(" at ").append(aResult.get("Date")).append(". ");
 					break;
 				case "Companies":
 					s = "Organization: " + aResult.get("Organization") + "; Location: " + aResult.get("Location");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The company is: ").append(aResult.get("Organization")).append(".");
+					rootText.append("Here is what I found in Companies: ").append(aResult.get("Organization"))
+							.append(" in ").append(aResult.get("Location")).append(". ");
 					break;
 				case "Contacts":
 					s = "Name: " + aResult.get("Name") + "; Organization: " + aResult.get("Organization") +
-							"; Phone: " + aResult.get("Phone") + "; Email: " + aResult.get
-							("Email");
-					aResult.put("Plain Text", s);
+							"; Phone: " + aResult.get("Phone") + "; Email: " + aResult.get("Email");
+					aResult.put("PlainText", s);
 
-					rootText.append("The Contact info I found is: ").append(aResult.get("Name")).append(", You can contact").append(" ").append("him/her at ").append(aResult.get("Phone")).append(" and by email at ").append(aResult.get("Email")).append(".");
+					rootText.append("Here is what I found in Contacts: ").append(aResult.get("Name"))
+							.append(" at ").append(aResult.get("Phone"))
+							.append(" and at ").append(aResult.get("Email")).append(". ");
 					break;
 				case "Countries":
-					s = "Organization: " + aResult.get("Organization") + "; Country: " + aResult.get
-							("Location");
-					aResult.put("Plain Text", s);
+					s = "Organization: " + aResult.get("Organization") + "; Country: " + aResult.get("Location");
+					aResult.put("PlainText", s);
 
-					rootText.append("The Country for ").append(aResult.get("Organization")).append(" is located in ").append(aResult.get("Location")).append(".");
+					rootText.append("Here is what I found in Countries: ").append(aResult.get("Organization"))
+							.append(" located in ").append(aResult.get("City")).append(", ")
+							.append(aResult.get("Location")).append(". ");
 					break;
 				case "Documents":
 					s = "Type: " + aResult.get("Type") + "; Date: " + aResult.get
 							("Date");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The Document you have is of type: ").append(aResult.get("Type")).append(".");
+					rootText.append("Here is what I found in Documents: ").append(aResult.get("Name"))
+							.append(" of type ").append(aResult.get("Type"))
+							.append(" on date ").append(aResult.get("Date")).append(". ");
 					break;
 				case "Employees":
 					s = "Name: " + aResult.get("Name") + "; Phone: " + aResult.get("Phone") +
 							"; Email: " + aResult.get("Email") + "; Employee id: " + aResult.get
 							("Employee-id");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The Employee is: ").append(aResult.get("Name")).append(" his/her id is ").append(aResult.get("Employee-id")).append(".");
+					rootText.append("Here is what I found in Employees: ").append(aResult.get("Name"))
+							.append(" id #").append(aResult.get("Employee-id"))
+							.append(" at ").append(aResult.get("Email")).append(" and at ")
+							.append(aResult.get("Phone")).append(". ");
 					break;
 				case "Events":
 					s = "Name: " + aResult.get("Name") + "; Date: " + aResult.get("Date") +
 							"; Description: " + aResult.get("Description");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The event upcoming is: ").append(aResult.get("Name")).append(" on ").append(aResult.get
-							("Date")).append(".");
+					rootText.append("Here is what I found in Events: ").append(aResult.get("Name"))
+							.append(" on ").append(aResult.get("Date")).append(". ");
 					break;
 				case "Inventory":
 					s = "Name: " + aResult.get("Name") + "; Date purchased: " + aResult.get("Date purchased") +
 							"; Quantity: " + aResult.get("Quantity");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The Inventory for: ").append(aResult.get("Name")).append(" is ").append(aResult.get
-							("Quantity")).append(".");
+					rootText.append("Here is what I found in Inventory: ").append(aResult.get("Name"))
+							.append(" and quantity ").append(aResult.get("Quantity")).append(". ");
 					break;
 				case "Expenses":
 					s = "Name: " + aResult.get("Name") + "; Cost: " + aResult.get("Cost") +
 							"; Description: " + aResult.get("Description");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The expense is: ").append(aResult.get("Name")).append(", it cost $").append(aResult
-							.get("Cost")).append(".");
+					rootText.append("Here is what I found in expenses: ID #").append(aResult.get("ID"))
+							.append(" it cost $").append(aResult.get("Cost")).append(" with the description: ")
+							.append(aResult.get("Description")).append(". ");
 					break;
 				case "Holidays":
 					s = "Name: " + aResult.get("Name") + "; Date: " + aResult.get("Date") +
 							"; Description: " + aResult.get("Description");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("The holiday for: ").append(aResult.get("Name")).append(".");
+					rootText.append("Here is what I found in Holidays: ").append(aResult.get("Name")).append(". ");
 					break;
 				case "Leads":
 					s = "Name: " + aResult.get("Name") + "; Organization: " + aResult.get("Organization") +
 							"; Description: " + aResult.get("Description");
 					aResult.put("Plain Text", s);
-					rootText.append("The Lead is: ").append(aResult.get("Name")).append(" from ").append(aResult.get
-							("Organization")).append(".");
+					rootText.append("Here is what I found in Leads: ").append(aResult.get("Name"))
+							.append(" from ").append(aResult.get("Organization")).append(". ");
 					break;
 				case "Meetings":
 					s = "Name: " + aResult.get("Name") + "; Date: " + aResult.get("Date") +
 							" Description: " + aResult.get("Description");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("Your upcoming meeting is: ").append(aResult.get("Name")).append(" it is about:").append(aResult.get("Description")).append(".");
+					rootText.append("Here is what I found in Meetings: ").append(aResult.get("Name"))
+							.append(" with the description: ").append(aResult.get("Description")).append(". ");
 					break;
 				case "Projects":
 					s = "Name: " + aResult.get("Name") + "; Type: " + aResult.get("Type") +
 							"; Start-date: " + aResult.get("Start") + "; End-date: " + aResult.get("End");
 					aResult.put("Plain Text", s);
 
-					rootText.append("Your upcoming project is: ").append(aResult.get("Name")).append(".");
+					rootText.append("Here is what I found in Projects: ").append(aResult.get("Name")).append(". ");
 					break;
 				case "Tasks":
 					s = "Name: " + aResult.get("Name") + "; Date: " + aResult.get("Date") +
 							"; Description: " + aResult.get("Description");
-					aResult.put("Plain Text", s);
+					aResult.put("PlainText", s);
 
-					rootText.append("Your current task is: ").append(aResult.get("Name")).append(".");
+					rootText.append("Here is what I found in Tasks: ").append(aResult.get("Name")).append(". ");
 					break;
 				default:
 					s = "Cannot create a plain sentence";

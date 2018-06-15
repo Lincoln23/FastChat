@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-//TODO have a mapping for keyLIst? ie.CEO CTO and other stuff that entities doesn't detect
+//TODO change logging file for local use
 @Service
 public class AWS_Service {
 	@Autowired
@@ -154,6 +154,7 @@ public class AWS_Service {
 					multiMap.put("Employees", "Birthday");
 					multiMap.put("Calls", "Date");
 					multiMap.put("Documents", "Date");
+					multiMap.put("Holidays", "Date");
 					multiMap.put("Leads", "Date");
 					multiMap.put("Meeting", "Date");
 					multiMap.put("Projects", "Start");
