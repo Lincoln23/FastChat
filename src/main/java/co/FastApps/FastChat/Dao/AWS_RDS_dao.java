@@ -128,7 +128,8 @@ public class AWS_RDS_dao {
 							"; Description: " + aResult.get("Description");
 					aResult.put("PlainText", s);
 
-					rootText.append("Here is what I found in expenses: ID #").append(aResult.get("ID"))
+					rootText.append("Here is what I found in expenses: ").append(aResult.get("Name"))
+							.append(" ID #").append(aResult.get("ID"))
 							.append(" it cost $").append(aResult.get("Cost")).append(" with the description: ")
 							.append(aResult.get("Description")).append(". ");
 					break;
