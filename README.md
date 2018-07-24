@@ -36,7 +36,7 @@ http://localhost:8080/who works in toronto?limit=20
   - Launch an MySQL RDS instance
 
 ** **NOTE** **
-You will need to configure your own SQL database and will need to change `Dao/AWS_RDS_dao`  so it correcty inserts the data
+You will need to configure your own SQL database and will need to change `Dao/AWS_RDS_dao`  so it correcty queries the data
 
 
 Put the apporiate values in  `{resources/application.properites}`
