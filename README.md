@@ -15,7 +15,7 @@ Built using:
   * `text` - Required: The user input message
   * `limit` - Optional: limits the number of input returned
 ```sh
-http://localhost:8080/${input}?limit=${int value}
+http://Your IP or localhost :8080/${input}?limit=${int value}
 ```
 Example
 ```sh
