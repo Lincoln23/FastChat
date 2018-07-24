@@ -19,7 +19,7 @@ http://Your IP or localhost :8080/${input}?limit=${int value}
 ```
 Example
 ```sh
-http://localhost:8080/who works in toronto?limit=20
+http://localhost:8080/who works in toronto and for amazon?limit=20
 ```
 ## Result
   - Response is in **JSON**
