@@ -14,11 +14,11 @@ Built using:
   * `text` - Required: The user input message
   * `limit` - Optional: limits the number of input returned
 ```sh
-http://Your IP or localhost :8080/${input}?limit=${int value}
+http://localhost:8080/${input}?limit=${int value}
 ```
 Example
 ```sh
-http://localhost:8080/who works in toronto and for amazon?limit=20
+http://localhost:8080/who works in toronto?limit=20
 ```
 ## Result
   - Response is in **JSON**
@@ -35,10 +35,6 @@ http://localhost:8080/who works in toronto and for amazon?limit=20
   - Launch an MySQL RDS instance
   - Launch an EC2 Ubuntu 16.04 instance
 
-** **NOTE** **
-You will need to configure your own SQL database and will need to change `Dao/AWS_RDS_dao`  so it correcty queries the data
-
-
 Put the apporiate values in  `{resources/application.properites}`
 
   ```sh
@@ -54,6 +50,12 @@ AWS_SECRET_KEY=
   - build your applicaiton as a `.war` file
   - Follow [this guide][setupTomcat] to setup your server as a Tomcat server
   - In the application manager, run your `.war` file
+
+** **NOTE** **
+You will need to configure your own SQL database and will need to change `Dao/AWS_RDS_dao`  so it correcty inserts the data. 
+My database is setup as such:
+    ![alt text](https://raw.githubusercontent.com/Lincoln23/FastChat/master/ChatBotDevDb.png)
+
 
 
 ## Testing
