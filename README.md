@@ -14,7 +14,7 @@ Built using:
   * `text` - Required: The user input message
   * `limit` - Optional: limits the number of input returned
 ```sh
-http://localhost:8080/${input}?limit=${int value}
+http://${your ip}:8080/${input}?limit=${int value}
 ```
 Example
 ```sh
@@ -52,7 +52,7 @@ AWS_SECRET_KEY=
   - In the application manager, run your `.war` file
 
 ** **NOTE** **
-You will need to configure your own SQL database and will need to change `Dao/AWS_RDS_dao`  so it correcty inserts the data. 
+You will need to configure your own SQL database and will need to change `Dao/AWS_RDS_dao`  to suit your needs. 
 My database is setup as such:
     ![alt text](https://raw.githubusercontent.com/Lincoln23/FastChat/master/ChatBotDevDb.png)
 
