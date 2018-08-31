@@ -2,7 +2,7 @@
 ### Java template
 # Compiled class file
 *.class
-
+src/main/resources/application.properties
 # Log file
 *.log
 
@@ -28,4 +28,4 @@
 hs_err_pid*
 
 
-/src/main/resources/application.properties
+
