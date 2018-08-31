@@ -29,7 +29,6 @@ public class AWS_RDS_dao {
 		final String sql = "SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema='ChatBotDevDb' AND " +
 				"table_name=?";
 		final List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, table);
-		System.out.println(result);
 		List<String> columnName = new ArrayList<>();
 		for (Map<String, Object> map : result) {
 			columnName.add((String) map.get("COLUMN_NAME"));

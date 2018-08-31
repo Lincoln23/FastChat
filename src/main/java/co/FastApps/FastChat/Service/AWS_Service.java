@@ -62,15 +62,12 @@ public class AWS_Service {
 	private void addNewValues(ListMultimap<String, String> multiMap, List<String> textArray) {
 		for (String key : multiMap.keySet()) {
 			List<String> columnNames = aws_rds_dao.getColumnName(key);
-			System.out.println(columnNames);
 			List<String> commonList = intersection(textArray, columnNames);
-			System.out.println(columnNames);
 			for (String put : commonList) {
 				if (!multiMap.containsValue(put)) {
 					multiMap.put(key, put);
 				}
 			}
-			System.out.println(multiMap);
 		}
 	}
 

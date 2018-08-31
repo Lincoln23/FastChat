@@ -16,7 +16,6 @@ class AWS_Controller {
 	//send a get request to ....8080/{your message}
 	@RequestMapping(value = "/{text}", method = RequestMethod.GET)
 	EndResult listEntity(@PathVariable("text") String text, @RequestParam(defaultValue = "10", required = false) int limit) {
-		System.out.println("this is limit >>> " + limit);
 		return this.aws_service.comprehend(text, limit);
 	}
 
