@@ -59,7 +59,7 @@ My database is setup as such:
 
 
 ## Testing
-You can write your own Junit testing in `{src/test/java}`
+You can write your own Junit testing in `src/test/java`
 
 
 
